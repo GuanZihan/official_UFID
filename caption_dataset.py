@@ -484,7 +484,7 @@ class DatasetLoader(object):
             if not self.__force_R_to_0:
                 examples[DatasetLoader.POISON_IMAGE] = masks * examples[DatasetLoader.RAW] + (1 - masks) * self.__trigger.repeat(*repeat_times)
             # print(f"self.__target.repeat(*repeat_times) shape: {self.__target.repeat(*repeat_times).shape}")
-            import torchvision.utils as tvu
+            # import torchvision.utils as tvu
 
             # tvu.save_image(examples[DatasetLoader.IMAGE], "before.png")
             # print(self.__target.repeat(*repeat_times).shape, examples[DatasetLoader.IMAGE].shape)
@@ -494,23 +494,17 @@ class DatasetLoader(object):
             # jittered_imgs = [jitter(orig_img) for _ in range(4)]
             # plot([orig_img] + jittered_imgs)
 
-            transforms_ = torch.nn.Sequential(
-                transforms.RandomRotation((-180, 180)),
-                transforms.RandomHorizontalFlip(p=0.5),
-                v2.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5.)),
-                v2.RandomPerspective(distortion_scale=0.6, p=1.0),
-                # v2.ElasticTransform(alpha=250.0),
-                v2.ColorJitter(brightness=.5, hue=.3)
-            )
+            # transforms_ = torch.nn.Sequential(
+            #     transforms.RandomRotation((-180, 180)),
+            #     transforms.RandomHorizontalFlip(p=0.5),
+            #     v2.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5.)),
+            #     v2.RandomPerspective(distortion_scale=0.6, p=1.0),
+            #     # v2.ElasticTransform(alpha=250.0),
+            #     v2.ColorJitter(brightness=.5, hue=.3)
+            # )
 
             # examples[DatasetLoader.IMAGE] = torch.clamp(alpha * examples[DatasetLoader.IMAGE] + (1-alpha) * self.__target.repeat(*repeat_times), 0, 1)
             examples[DatasetLoader.IMAGE] = transforms_(self.__target.repeat(*repeat_times))
-            
-            # print(repeat_times)
-
-            tvu.save_image(examples[DatasetLoader.IMAGE], "after.png")
-            input(123)
-            
             examples = backdoor_caption_transforms(examples)
             return examples
         def backdoor_caption_transforms(examples) -> DatasetDict:
